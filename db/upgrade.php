@@ -725,5 +725,41 @@ function xmldb_attendance_upgrade($oldversion=0) {
         upgrade_mod_savepoint(true, 2021082609, 'attendance');
     }
 
+    if ($oldversion < 2023042404) {
+
+        $table = new xmldb_table('attendance_sessions_extra');
+        if (!$dbman->table_exists($table)) {
+            // Create a table.
+            $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+            $table->add_field('sessionid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL);
+
+            $table->add_field('sessiondatestart', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL);
+            $table->add_field('sessiondateend', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL);
+            $table->add_field('applicationdeadline', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL);
+
+            $table->add_field('sessionform', XMLDB_TYPE_CHAR, '1', null, XMLDB_NOTNULL);
+            $table->add_field('sessionmethod', XMLDB_TYPE_TEXT, '4', null, XMLDB_NOTNULL);
+            $table->add_field('classlanguage', XMLDB_TYPE_TEXT, '2', null, XMLDB_NOTNULL);
+
+            $table->add_field('country', XMLDB_TYPE_TEXT, '2');
+            $table->add_field('city', XMLDB_TYPE_TEXT, '64');
+
+            $table->add_key('PK_id', XMLDB_KEY_PRIMARY, ['id']);
+            $table->add_key('UQ_session_id', XMLDB_KEY_UNIQUE, ['sessionid']);
+            $table->add_key(
+                'FK_attendancesessions_attendancesessionsextra_sessionid',
+                XMLDB_KEY_FOREIGN,
+                array('sessionid'),
+                'attendance_sessions',
+                array('id')
+            );
+
+            $dbman->create_table($table, $continue = true, $feedback = true);
+        }
+
+        // Attendance savepoint reached.
+        upgrade_mod_savepoint(true, 2023042404, 'attendance');
+    }
+
     return $result;
 }

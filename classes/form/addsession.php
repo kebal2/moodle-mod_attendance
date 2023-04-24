@@ -163,6 +163,7 @@ class addsession extends moodleform {
         $mform->addGroup($radio, 'sessionform');
 
         $options = array(
+            '' => get_string('select', 'attendance'),
             'F2F' => get_string('sessionmethod_f2f', 'attendance'),
             'V' => get_string('sessionmethod_virtual', 'attendance'),
         );
