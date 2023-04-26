@@ -50,6 +50,9 @@ class updatesession extends \moodleform {
         if (!$sess = $DB->get_record('attendance_sessions', array('id' => $sessionid) )) {
             error('No such session in this course');
         }
+
+        $sess_extra = $DB->get_record('attendance_sessions_extra', array('sessionid' => $sessionid) );
+
         $attendancesubnet = $DB->get_field('attendance', 'subnet', array('id' => $sess->attendanceid));
         $defopts = array('maxfiles' => EDITOR_UNLIMITED_FILES, 'noclean' => true, 'context' => $modcontext);
         $sess = file_prepare_standard_editor($sess, 'description', $defopts, $modcontext, 'mod_attendance', 'session', $sess->id);
@@ -80,7 +83,16 @@ class updatesession extends \moodleform {
             'preventsharediptime' => $sess->preventsharediptime,
             'includeqrcode' => $sess->includeqrcode,
             'rotateqrcode' => $sess->rotateqrcode,
-            'automarkcmid' => $sess->automarkcmid
+            'automarkcmid' => $sess->automarkcmid,
+
+            'sessionform' => ['sessionformtype' => $sess_extra->sessionform],
+            'sessionmethod' => $sess_extra->sessionmethod,
+            'sessionlanguage' => $sess_extra->classlanguage,
+            'datestart' => $sess_extra->sessiondatestart,
+            'dateend' => $sess_extra->sessiondateend,
+            'applicationdeadline' => $sess_extra->applicationdeadline,
+            'country' => isset($sess_extra->country) ? $sess_extra->country : '',
+            'city' => isset($sess_extra->city) ? $sess_extra->city : ''
         );
         if ($sess->subnet == $attendancesubnet) {
             $data['usedefaultsubnet'] = 1;
@@ -135,8 +147,8 @@ class updatesession extends \moodleform {
         $mform->setExpanded('headeraddextendedinfo');
 
         $radio = array();
-        $radio[] = $mform->createElement('radio', 'sessionform', null, get_string('sessionform_w', 'attendance'), 0);
-        $radio[] = $mform->createElement('radio', 'sessionform', null, get_string('sessionform_s', 'attendance'), 1);
+        $radio[] = $mform->createElement('radio', 'sessionformtype', null, get_string('sessionform_w', 'attendance'), 'W');
+        $radio[] = $mform->createElement('radio', 'sessionformtype', null, get_string('sessionform_s', 'attendance'), 'S');
         $mform->addGroup($radio, 'sessionform');
 
         $options = array(
@@ -147,7 +159,6 @@ class updatesession extends \moodleform {
         $mform->addElement('select', 'sessionmethod', get_string('sessionmethod', 'attendance'), $options);
 
         $options = array(
-            '' => get_string('select', 'attendance'),
             'BG' => 'Bulgarian',
             'HR' => 'Croatian',
             'CS' => 'Czech',
@@ -180,7 +191,6 @@ class updatesession extends \moodleform {
         $mform->addElement('date_selector', 'applicationdeadline', get_string('applicationdeadline', 'attendance'));
 
         $options = [
-            '' => get_string('select', 'attendance'),
             'AT' => 'Austria',
             'BE' => 'Belgium',
             'BG' => 'Bulgaria',
@@ -331,6 +341,28 @@ class updatesession extends \moodleform {
                 empty($data['preventsharediptime'])) {
             $errors['preventsharedgroup'] = get_string('iptimemissing', 'attendance');
 
+        }
+
+        if(empty($data['sessionmethod'])){
+            $errors['sessionmethod'] = get_string('should_be_selected', 'attendance', 'method');
+        }
+
+        $f2f_session = $data['sessionmethod'] !== 'V';
+        if($f2f_session){
+            if(empty($data['country'])){
+                $errors['country'] = get_string('should_be_selected', 'attendance', 'country');
+            }
+            if(empty($data['city'])){
+                $errors['city'] = get_string('should_be_filled', 'attendance');
+            }
+        }
+
+        if($data['datestart'] > $data['dateend']){
+            $errors['datestart'] = get_string('start_before_end', 'attendance');
+        }
+
+        if(empty($data['sessionlanguage'])){
+            $errors['sessionlanguage'] = get_string('should_be_selected', 'attendance', 'language');
         }
         return $errors;
     }

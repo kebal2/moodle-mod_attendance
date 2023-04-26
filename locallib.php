@@ -932,6 +932,22 @@ function attendance_construct_sessions_data_for_add($formdata, mod_attendance_st
     return $sessions;
 }
 
+function attendance_construct_sessions_extra_data_for_add($formdata, $session_id,  mod_attendance_structure $att)
+{
+    $extra  = new stdClass();
+    $extra->sessionid = $session_id;
+    $extra->sessionform = $formdata->sessionform['sessionformtype'];
+    $extra->sessionmethod = $formdata->sessionmethod;
+    $extra->classlanguage = $formdata->sessionlanguage;
+    $extra->sessiondatestart = $formdata->datestart;
+    $extra->sessiondateend = $formdata->dateend;
+    $extra->applicationdeadline = $formdata->applicationdeadline;
+    $extra->country = isset($formdata->country) ? $formdata->country : null;
+    $extra->city = isset($formdata->city) ? $formdata->city : null;
+
+    return $extra;
+}
+
 /**
  * Helper function for attendance_construct_sessions_data_for_add().
  *

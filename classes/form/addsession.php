@@ -158,9 +158,10 @@ class addsession extends moodleform {
         $mform->setExpanded('headeraddextendedinfo');
 
         $radio = array();
-        $radio[] = $mform->createElement('radio', 'sessionform', null, get_string('sessionform_w', 'attendance'), 0);
-        $radio[] = $mform->createElement('radio', 'sessionform', null, get_string('sessionform_s', 'attendance'), 1);
+        $radio[] = $mform->createElement('radio', 'sessionformtype', null, get_string('sessionform_w', 'attendance'), 'W');
+        $radio[] = $mform->createElement('radio', 'sessionformtype', null, get_string('sessionform_s', 'attendance'), 'S');
         $mform->addGroup($radio, 'sessionform');
+        $mform->setDefault("sessionform[sessionformtype]", 'W');
 
         $options = array(
             '' => get_string('select', 'attendance'),
@@ -169,6 +170,7 @@ class addsession extends moodleform {
         );
 
         $mform->addElement('select', 'sessionmethod', get_string('sessionmethod', 'attendance'), $options);
+        $mform->addRule('sessionmethod', null, 'required', null, 'client');
 
         $options = array(
             '' => get_string('select', 'attendance'),
@@ -199,6 +201,8 @@ class addsession extends moodleform {
         );
 
         $mform->addElement('select', 'sessionlanguage', get_string('sessionlanguage', 'attendance'), $options);
+        $mform->addRule('sessionlanguage', null, 'required', null, 'client');
+
         $mform->addElement('date_selector', 'datestart', get_string('sessiondatestart', 'attendance'));
         $mform->addElement('date_selector', 'dateend', get_string('sessiondateend', 'attendance'));
         $mform->addElement('date_selector', 'applicationdeadline', get_string('applicationdeadline', 'attendance'));
@@ -239,8 +243,8 @@ class addsession extends moodleform {
         $options = ['maxlength' => '100', 'size' => '25', 'autocomplete' => 'none'];
         $mform->addElement('text', 'city', get_string('city', 'attendance'), $options);
         $mform->setType('city', PARAM_ALPHAEXT);
-
         $mform->hideIf('city', 'sessionmethod', 'eq', 'V');
+
 
         // For multiple sessions.
         $mform->addElement('header', 'headeraddmultiplesessions', get_string('addmultiplesessions', 'attendance'));
@@ -460,6 +464,29 @@ class addsession extends moodleform {
             $errors['preventsharedgroup'] = get_string('iptimemissing', 'attendance');
 
         }
+
+        if(empty($data['sessionmethod'])){
+            $errors['sessionmethod'] = get_string('should_be_selected', 'attendance', 'method');
+        }
+
+        $f2f_session = $data['sessionmethod'] !== 'V';
+        if($f2f_session){
+            if(empty($data['country'])){
+                $errors['country'] = get_string('should_be_selected', 'attendance', 'country');
+            }
+            if(empty($data['city'])){
+                $errors['city'] = get_string('should_be_filled', 'attendance');
+            }
+        }
+
+        if($data['datestart'] > $data['dateend']){
+            $errors['datestart'] = get_string('start_before_end', 'attendance');
+        }
+
+        if(empty($data['sessionlanguage'])){
+            $errors['sessionlanguage'] = get_string('should_be_selected', 'attendance', 'language');
+        }
+
         return $errors;
     }
 

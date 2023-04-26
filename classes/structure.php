@@ -476,6 +476,17 @@ class mod_attendance_structure {
     }
 
     /**
+     * Add session extras.
+     *
+     * @param array $sessionextras
+     */
+    public function add_session_extras($session_extras) {
+        foreach ($session_extras as $ses_e) {
+            $this->add_session_extra($ses_e);
+        }
+    }
+
+    /**
      * Add single session.
      *
      * @param stdClass $sess
@@ -553,6 +564,10 @@ class mod_attendance_structure {
         return $sess->id;
     }
 
+    public function add_session_extra($sess_extra): int {
+        global $DB;
+        return $DB->insert_record('attendance_sessions_extra', $sess_extra);
+    }
     /**
      * Update session from form.
      *
@@ -652,6 +667,32 @@ class mod_attendance_structure {
         $event->add_record_snapshot('course_modules', $this->cm);
         $event->add_record_snapshot('attendance_sessions', $sess);
         $event->trigger();
+    }
+    /**
+     * Update session extra from form.
+     *
+     * @param stdClass $formdata
+     * @param int $sessionid
+     */
+    public function update_session_extra_from_form_data($formdata, $sessionid) {
+        global $DB;
+
+        if (!$sess = $DB->get_record('attendance_sessions_extra', array('sessionid' => $sessionid) )) {
+            throw new moodle_exception('No such session in this course');
+        }
+
+        $sess->sessionform = $formdata->sessionform['sessionformtype'];
+        $sess->sessionmethod = $formdata->sessionmethod;
+        $sess->classlanguage = $formdata->sessionlanguage;
+        $sess->sessiondatestart = $formdata->datestart;
+        $sess->sessiondateend = $formdata->dateend;
+        $sess->applicationdeadline = $formdata->applicationdeadline;
+        $sess->country = isset($formdata->country) ? $formdata->country : null;
+        $sess->city = isset($formdata->city) ? $formdata->city : null;
+
+        $DB->update_record('attendance_sessions_extra', $sess);
+
+
     }
 
     /**
@@ -1242,6 +1283,16 @@ class mod_attendance_structure {
             'other' => array('info' => implode(', ', $sessionsids))));
         $event->add_record_snapshot('course_modules', $this->cm);
         $event->trigger();
+    }
+
+    /**
+     * Delete session extras.
+     * @param array $sessionsids
+     */
+    public function delete_session_extras($sessionsids) {
+        global $DB;
+
+        $DB->delete_records_list('attendance_sessions_extra', 'sessionid', $sessionsids);
     }
 
     /**

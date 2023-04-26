@@ -73,12 +73,39 @@ switch ($att->pageparams->action) {
 
         if ($formdata = $mform->get_data()) {
             $sessions = attendance_construct_sessions_data_for_add($formdata, $att);
-            $att->add_sessions($sessions);
-            if (count($sessions) == 1) {
-                $message = get_string('sessiongenerated', 'attendance');
-            } else {
-                $message = get_string('sessionsgenerated', 'attendance', count($sessions));
+
+            try {
+                $transaction = $DB->start_delegated_transaction();
+
+                $att->add_sessions($sessions);
+
+                if (count($sessions) == 1) {
+                    $session_extra = attendance_construct_sessions_extra_data_for_add($formdata, $sessions[0]->id, $att);
+
+                    $att->add_session_extra($session_extra);
+
+                    $message = get_string('sessiongenerated', 'attendance');
+                } else {
+                    foreach ($sessions as $session) {
+                        $session_extra = attendance_construct_sessions_extra_data_for_add($formdata, $session->id, $att);
+
+                        $att->add_session_extra($session_extra);
+                    }
+                    $message = get_string('sessionsgenerated', 'attendance', count($sessions));
+                }
+
+                $transaction->allow_commit();
+            } catch (Exception $e) {
+                // Make sure transaction is valid.
+                if (!empty($transaction) && !$transaction->is_disposed()) {
+                    try {
+                        $transaction->rollback($e);
+                    } catch (Exception $ex) {
+                    }
+                }
+                throw $e;
             }
+
 
             mod_attendance_notifyqueue::notify_success($message);
             // Redirect to the sessions tab always showing all sessions.
@@ -101,8 +128,23 @@ switch ($att->pageparams->action) {
             if (empty($formdata->autoassignstatus)) {
                 $formdata->autoassignstatus = 0;
             }
-            $att->update_session_from_form_data($formdata, $sessionid);
+            try {
+                $transaction = $DB->start_delegated_transaction();
 
+                $att->update_session_from_form_data($formdata, $sessionid);
+                $att->update_session_extra_from_form_data($formdata, $sessionid);
+
+                $transaction->allow_commit();
+            } catch (Exception $e) {
+                // Make sure transaction is valid.
+                if (!empty($transaction) && !$transaction->is_disposed()) {
+                    try {
+                        $transaction->rollback($e);
+                    } catch (Exception $ex) {
+                    }
+                }
+                throw $e;
+            }
             mod_attendance_notifyqueue::notify_success(get_string('sessionupdated', 'attendance'));
             redirect($att->url_manage());
         }
@@ -114,6 +156,7 @@ switch ($att->pageparams->action) {
 
         if (isset($confirm) && confirm_sesskey()) {
             $att->delete_sessions(array($sessionid));
+            $att->delete_session_extras(array($sessionid));
             attendance_update_users_grade($att);
             redirect($att->url_manage(), get_string('sessiondeleted', 'attendance'));
         }
@@ -142,6 +185,7 @@ switch ($att->pageparams->action) {
             $sessionsids = explode('_', $sessionsids);
             if ($att->pageparams->action == mod_attendance_sessions_page_params::ACTION_DELETE_SELECTED) {
                 $att->delete_sessions($sessionsids);
+                $att->delete_session_extras(array($sessionid));
                 attendance_update_users_grade($att);
                 redirect($att->url_manage(), get_string('sessiondeleted', 'attendance'));
             }
@@ -200,6 +244,7 @@ switch ($att->pageparams->action) {
         if ($confirm && confirm_sesskey()) {
             $sessions = $att->get_hidden_sessions();
             $att->delete_sessions(array_keys($sessions));
+            $att->delete_session_extras(array($sessionid));
             redirect($att->url_manage(), get_string('hiddensessionsdeleted', 'attendance'));
         }
 

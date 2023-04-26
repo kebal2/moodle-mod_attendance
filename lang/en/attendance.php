@@ -652,3 +652,8 @@ $string['applicationdeadline'] = 'applicationdeadline';
 $string['country'] = 'country';
 $string['city'] = 'city';
 $string['select'] = 'Select';
+$string['should_be_selected'] = 'A {$a} should be selected!';
+$string['should_be_filled'] = 'Please fill out the field!';
+$string['start_before_end'] = 'Start date should precede end date!';
+
+
