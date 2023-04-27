@@ -149,7 +149,7 @@ class updatesession extends \moodleform {
         $radio = array();
         $radio[] = $mform->createElement('radio', 'sessionformtype', null, get_string('sessionform_w', 'attendance'), 'W');
         $radio[] = $mform->createElement('radio', 'sessionformtype', null, get_string('sessionform_s', 'attendance'), 'S');
-        $mform->addGroup($radio, 'sessionform');
+        $mform->addGroup($radio, 'sessionform', get_string('sessionform', 'attendance'));
 
         $options = array(
             'F2F' => get_string('sessionmethod_f2f', 'attendance'),
@@ -158,68 +158,17 @@ class updatesession extends \moodleform {
 
         $mform->addElement('select', 'sessionmethod', get_string('sessionmethod', 'attendance'), $options);
 
-        $options = array(
-            'BG' => 'Bulgarian',
-            'HR' => 'Croatian',
-            'CS' => 'Czech',
-            'DA' => 'Danish',
-            'NL' => 'Dutch',
-            'EN' => 'English',
-            'ET' => 'Estonian',
-            'FI' => 'Finnish',
-            'FR' => 'French',
-            'DE' => 'German',
-            'EL' => 'Greek',
-            'HU' => 'Hungarian',
-            'GA' => 'Irish',
-            'IT' => 'Italian',
-            'LV' => 'Latvian',
-            'LT' => 'Lithuanian',
-            'MT' => 'Maltese',
-            'PL' => 'Polish',
-            'PT' => 'Portuguese',
-            'RO' => 'Romanian',
-            'SK' => 'Slovak',
-            'SL' => 'Slovenian',
-            'ES' => 'Spanish',
-            'SV' => 'Swedish'
-        );
+        $languages = get_string_manager()->get_list_of_languages();
+        $mform->addElement('select', 'sessionlanguage', get_string('sessionlanguage', 'attendance'), $languages);
 
-        $mform->addElement('select', 'sessionlanguage', get_string('sessionlanguage', 'attendance'), $options);
         $mform->addElement('date_selector', 'datestart', get_string('sessiondatestart', 'attendance'));
         $mform->addElement('date_selector', 'dateend', get_string('sessiondateend', 'attendance'));
         $mform->addElement('date_selector', 'applicationdeadline', get_string('applicationdeadline', 'attendance'));
 
-        $options = [
-            'AT' => 'Austria',
-            'BE' => 'Belgium',
-            'BG' => 'Bulgaria',
-            'HR' => 'Croatia',
-            'CY' => 'Cyprus',
-            'CZ' => 'Czech Republic',
-            'DK' => 'Denmark',
-            'EE' => 'Estonia',
-            'FI' => 'Finland',
-            'FR' => 'France',
-            'DE' => 'Germany',
-            'GR' => 'Greece',
-            'HU' => 'Hungary',
-            'IE' => 'Ireland',
-            'IT' => 'Italy',
-            'LV' => 'Latvia',
-            'LT' => 'Lithuania',
-            'LU' => 'Luxembourg',
-            'MT' => 'Malta',
-            'NL' => 'The Netherlands',
-            'PL' => 'Poland',
-            'PT' => 'Portugal',
-            'RO' => 'Romania',
-            'SK' => 'Slovakia',
-            'SI' => 'Slovenia',
-            'ES' => 'Spain',
-            'SE' => 'Sweden'
-        ];
-        $mform->addElement('select', 'country', get_string('country', 'attendance'), $options);
+        $choices = get_string_manager()->get_list_of_countries();
+        $choices = array(''=>get_string('selectacountry').'...') + $choices;
+        $mform->addElement('select', 'country', get_string('country', 'attendance'), $choices);
+
         $mform->hideIf('country', 'sessionmethod', 'eq', 'V');
 
         $options = ['maxlength' => '100', 'size' => '25', 'autocomplete' => 'none'];
