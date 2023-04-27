@@ -64,6 +64,27 @@
         <INDEX NAME="caleventid" UNIQUE="false" FIELDS="caleventid"/>
       </INDEXES>
     </TABLE>
+    <TABLE NAME="attendance_sessions_extras" COMMENT="attendance_sessions table">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="sessionid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="sessiondatestart" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="sessiondateend" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="applicationdeadline" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="sessionform" TYPE="char" LENGTH="1" NOTNULL="true" SEQUENCE="false" />
+        <FIELD NAME="sessionmethod" TYPE="text" LENGTH="4" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="classlanguage" TYPE="text" LENGTH="2" NOTNULL="true" SEQUENCE="false" />
+        <FIELD NAME="country" TYPE="text" LENGTH="2" NOTNULL="false" SEQUENCE="false" />
+        <FIELD NAME="city" TYPE="text" LENGTH="64" NOTNULL="false" SEQUENCE="false" />
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="PK_id" TYPE="primary" FIELDS="id" COMMENT="Primary key for attendance_sessions_extra"/>
+        <KEY NAME="FK_attendancesessions_attendancesessionsextra_sessionid" TYPE="foreign" FIELDS="sessionid" REFTABLE="attendance_sessions" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="UQ_session_id" UNIQUE="true" FIELDS="sessionid"/>
+      </INDEXES>
+    </TABLE>
     <TABLE NAME="attendance_log" COMMENT="attendance_log table retrofitted from MySQL">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
