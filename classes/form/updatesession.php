@@ -83,17 +83,23 @@ class updatesession extends \moodleform {
             'preventsharediptime' => $sess->preventsharediptime,
             'includeqrcode' => $sess->includeqrcode,
             'rotateqrcode' => $sess->rotateqrcode,
-            'automarkcmid' => $sess->automarkcmid,
-
-            'sessionform' => ['sessionformtype' => $sess_extra->sessionform],
-            'sessionmethod' => $sess_extra->sessionmethod,
-            'sessionlanguage' => $sess_extra->classlanguage,
-            'datestart' => $sess_extra->sessiondatestart,
-            'dateend' => $sess_extra->sessiondateend,
-            'applicationdeadline' => $sess_extra->applicationdeadline,
-            'country' => isset($sess_extra->country) ? $sess_extra->country : '',
-            'city' => isset($sess_extra->city) ? $sess_extra->city : ''
+            'automarkcmid' => $sess->automarkcmid
         );
+
+        if(!empty($sess_extra)){
+            $data['sessionform'] = ['sessionformtype' => $sess_extra->sessionform];
+            $data['sessionmethod'] = $sess_extra->sessionmethod;
+            $data['sessionlanguage'] = $sess_extra->classlanguage;
+            $data['datestart'] = $sess_extra->sessiondatestart;
+            $data['dateend'] = $sess_extra->sessiondateend;
+            $data['applicationdeadline'] = $sess_extra->applicationdeadline;
+            $data['country'] = isset($sess_extra->country) ? $sess_extra->country : '';
+            $data['city'] = isset($sess_extra->city) ? $sess_extra->city : '';
+        }else{
+            $data['sessionform'] = ['sessionformtype' => 'W'];
+            $data['sessionlanguage'] = 'en';
+        }
+
         if ($sess->subnet == $attendancesubnet) {
             $data['usedefaultsubnet'] = 1;
         } else {
@@ -165,9 +171,11 @@ class updatesession extends \moodleform {
         $mform->addElement('date_selector', 'dateend', get_string('sessiondateend', 'attendance'));
         $mform->addElement('date_selector', 'applicationdeadline', get_string('applicationdeadline', 'attendance'));
 
-        $choices = get_string_manager()->get_list_of_countries();
-        $choices = array(''=>get_string('selectacountry').'...') + $choices;
-        $mform->addElement('select', 'country', get_string('country', 'attendance'), $choices);
+        $countries = get_string_manager()->get_list_of_countries();
+        if(empty($sess_extra)){
+            $countries = array(''=>get_string('selectacountry').'...') + $countries;
+        }
+        $mform->addElement('select', 'country', get_string('country', 'attendance'), $countries);
 
         $mform->hideIf('country', 'sessionmethod', 'eq', 'V');
 

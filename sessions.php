@@ -132,7 +132,10 @@ switch ($att->pageparams->action) {
                 $transaction = $DB->start_delegated_transaction();
 
                 $att->update_session_from_form_data($formdata, $sessionid);
-                $att->update_session_extra_from_form_data($formdata, $sessionid);
+
+                $session_extra = attendance_construct_sessions_extra_data_for_add($formdata, $sessionid, $att);
+
+                $att->update_session_extra($session_extra, $sessionid);
 
                 $transaction->allow_commit();
             } catch (Exception $e) {

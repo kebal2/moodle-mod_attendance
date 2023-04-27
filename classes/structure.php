@@ -674,25 +674,25 @@ class mod_attendance_structure {
      * @param stdClass $formdata
      * @param int $sessionid
      */
-    public function update_session_extra_from_form_data($formdata, $sessionid) {
+    public function update_session_extra($session_extra, $sessionid)
+    {
         global $DB;
 
-        if (!$sess = $DB->get_record('attendance_sessions_extra', array('sessionid' => $sessionid) )) {
-            throw new moodle_exception('No such session in this course');
+        if (!$sess = $DB->get_record('attendance_sessions_extra', array('sessionid' => $sessionid))) {
+            $session_extra->sessionid = $sessionid;
+            $this->add_session_extra($session_extra);
+        } else {
+            $sess->sessionform = $session_extra->sessionform;
+            $sess->sessionmethod = $session_extra->sessionmethod;
+            $sess->classlanguage = $session_extra->classlanguage;
+            $sess->sessiondatestart = $session_extra->sessiondatestart;
+            $sess->sessiondateend = $session_extra->sessiondateend;
+            $sess->applicationdeadline = $session_extra->applicationdeadline;
+            $sess->country = $session_extra->country;
+            $sess->city = $session_extra->city;
+
+            $DB->update_record('attendance_sessions_extra', $sess);
         }
-
-        $sess->sessionform = $formdata->sessionform['sessionformtype'];
-        $sess->sessionmethod = $formdata->sessionmethod;
-        $sess->classlanguage = $formdata->sessionlanguage;
-        $sess->sessiondatestart = $formdata->datestart;
-        $sess->sessiondateend = $formdata->dateend;
-        $sess->applicationdeadline = $formdata->applicationdeadline;
-        $sess->country = isset($formdata->country) ? $formdata->country : null;
-        $sess->city = isset($formdata->city) ? $formdata->city : null;
-
-        $DB->update_record('attendance_sessions_extra', $sess);
-
-
     }
 
     /**
