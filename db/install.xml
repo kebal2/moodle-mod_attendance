@@ -64,7 +64,7 @@
         <INDEX NAME="caleventid" UNIQUE="false" FIELDS="caleventid"/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="attendance_sessions_extras" COMMENT="attendance_sessions table">
+    <TABLE NAME="attendance_sessions_extra" COMMENT="attendance_sessions_extra table">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="sessionid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
