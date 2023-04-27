@@ -640,20 +640,19 @@ $string['cannottakethisgroup'] = 'You are not a member of the course group that 
 $string['extendedinfoexpanded'] = 'Additional session information expanded';
 $string['extendedinfoexpanded_desc'] = 'Show extended information query form for past and future sessions.';
 $string['addextendedinfo'] = 'Additional informations';
+$string['sessionform'] = 'Training type';
 $string['sessionform_w'] = 'Workshop';
 $string['sessionform_s'] = 'STM';
-$string['sessionmethod'] = 'Method';
+$string['sessionmethod'] = 'Session type';
 $string['sessionmethod_f2f'] = 'Face to face';
 $string['sessionmethod_virtual'] = 'Virtual';
 $string['sessionlanguage'] = 'Language';
-$string['sessiondatestart'] = 'sessiondatestart';
-$string['sessiondateend'] = 'sessiondateend';
-$string['applicationdeadline'] = 'applicationdeadline';
-$string['country'] = 'country';
-$string['city'] = 'city';
+$string['sessiondatestart'] = 'Start date';
+$string['sessiondateend'] = 'End date';
+$string['applicationdeadline'] = 'Application deadline';
+$string['country'] = 'Country';
+$string['city'] = 'City';
 $string['select'] = 'Select';
 $string['should_be_selected'] = 'A {$a} should be selected!';
 $string['should_be_filled'] = 'Please fill out the field!';
 $string['start_before_end'] = 'Start date should precede end date!';
-
-
